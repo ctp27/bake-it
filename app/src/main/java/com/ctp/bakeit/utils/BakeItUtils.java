@@ -93,4 +93,25 @@ public class BakeItUtils {
         return values;
     }
 
+
+    public static String getFormattedDescriptionString(String description, int position){
+
+        final int STRING_THRESHOLD=100;
+
+        String newDescription = null;
+        if(position!=0) {
+            newDescription = description.substring(3);
+        }
+        else {
+            return description;
+        }
+
+        if(newDescription.length()>STRING_THRESHOLD){
+            newDescription = newDescription.substring(0,STRING_THRESHOLD);
+            newDescription = newDescription +"...";
+        }
+
+        return newDescription;
+    }
+
 }

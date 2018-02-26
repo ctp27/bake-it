@@ -51,7 +51,7 @@ public class BakeItContract {
                 .appendPath(PATH_STEP).build();
 
 
-        public static Uri getRecipeContentUriForId(int id){
+        public static Uri getStepContentUriForId(int id){
             return STEP_CONTENT_URI.buildUpon().appendPath(Integer.toString(id)).build();
         }
 

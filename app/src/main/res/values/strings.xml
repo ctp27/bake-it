@@ -2,4 +2,6 @@
     <string name="app_name">BakeIt</string>
     <string name="view_recipe_btn_text">VIEW RECIPE</string>
     <string name="ingredients_count_label_text">Ingredients</string>
+    <string name="recipe_details_ingredients_title">INGREDIENTS</string>
+    <string name="recipe_details_cooking_directions_label">COOKING DIRECTIONS</string>
 </resources>
