@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">BakeIt</string>
+    <string name="view_recipe_btn_text">VIEW RECIPE</string>
+    <string name="ingredients_count_label_text">Ingredients</string>
 </resources>
