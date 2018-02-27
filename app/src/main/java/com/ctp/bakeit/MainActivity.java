@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity
 //        getContentResolver().delete(BakeItContract.RecipeEntry.RECIPE_CONTENT_URI,null,null);
 //        getContentResolver().delete(BakeItContract.IngredientEntry.INGREDIENT_CONTENT_URI,null,null);
 //        getContentResolver().delete(BakeItContract.StepEntry.STEP_CONTENT_URI,null,null);
-
+//
 //        new DownloadJsonTask().execute(NetworkUtils.buildJsonRecipeUrl());
         getSupportLoaderManager().restartLoader(RECIPE_CURSOR_LOADER_ID,null, this);
 

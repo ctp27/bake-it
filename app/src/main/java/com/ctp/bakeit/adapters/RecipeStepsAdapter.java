@@ -30,7 +30,7 @@ public class RecipeStepsAdapter extends RecyclerView.Adapter<RecipeStepsAdapter.
     }
 
     public interface RecipeStepsAdapterCallback{
-        void onRecipeStepClicked(int stepId);
+        void onRecipeStepClicked(int stepId,int count);
     }
 
     @Override
@@ -94,7 +94,7 @@ public class RecipeStepsAdapter extends RecyclerView.Adapter<RecipeStepsAdapter.
         @Override
         public void onClick(View v) {
             long id = (long)itemView.getTag();
-            callback.onRecipeStepClicked((int)id);
+            callback.onRecipeStepClicked(getAdapterPosition(),cursor.getCount());
         }
     }
 }

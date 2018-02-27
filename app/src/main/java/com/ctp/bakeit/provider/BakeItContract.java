@@ -67,6 +67,8 @@ public class BakeItContract {
 
         public static final String COLUMN_RECIPE_ID = "recId";
 
+        public static final String COLUMN_STEP_NUMBER = "stepNumber";
+
     }
 
 

@@ -42,6 +42,7 @@ public class RecipeDetailsFragment extends Fragment
 
     private Uri queryUri;
     private String recipeId;
+    private String recipeTitle;
     private boolean isRecyclerViewFocused;
 
     private RecipeDetailsFragmentCallback mCallback;
@@ -164,8 +165,8 @@ public class RecipeDetailsFragment extends Fragment
         }
 
         data.moveToFirst();
-        String title = data.getString(data.getColumnIndex(BakeItContract.RecipeEntry.COLUMN_NAME));
-        mCallback.onFragmentCreated(title);
+        recipeTitle = data.getString(data.getColumnIndex(BakeItContract.RecipeEntry.COLUMN_NAME));
+        mCallback.onFragmentCreated(recipeTitle);
 
 
     }
@@ -183,13 +184,17 @@ public class RecipeDetailsFragment extends Fragment
 
     }
 
+
     @Override
-    public void onRecipeStepClicked(int stepId) {
-        Uri uri = BakeItContract.StepEntry.getStepContentUriForId(stepId);
+    public void onRecipeStepClicked(int stepNumber,int count) {
+
         Intent intent = new Intent(getContext(), StepDetailActivity.class);
-        intent.setData(uri);
+//        intent.putExtra(StepDetailActivity.)
+        intent.putExtra(StepDetailActivity.INTENT_RECIPE_NAME_EXTRA,recipeTitle);
         intent.putExtra(StepDetailActivity.INTENT_RECIPE_ID_EXTRA,recipeId);
-        Log.d(LOG_TAG,"Step Id is "+stepId);
+        intent.putExtra(StepDetailActivity.INTENT_RECIPE_STEP_NUMBER, stepNumber);
+        intent.putExtra(StepDetailActivity.INTENT_RECIPE_STEP_COUNT,count);
+        Log.d(LOG_TAG,"Step Id is "+stepNumber);
         startActivity(intent);
     }
 

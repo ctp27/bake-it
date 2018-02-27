@@ -1,6 +1,7 @@
 package com.ctp.bakeit.utils;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 
 import com.ctp.bakeit.models.Ingredient;
 import com.ctp.bakeit.models.Recipe;
@@ -88,6 +89,7 @@ public class BakeItUtils {
             cv.put(BakeItContract.StepEntry.COLUMN_VIDEO_URL, step.getVideoURL());
             cv.put(BakeItContract.StepEntry.COLUMN_THUMBNAIL_URL, step.getThumbnailURL());
             cv.put(BakeItContract.StepEntry.COLUMN_RECIPE_ID,recipeId);
+            cv.put(BakeItContract.StepEntry.COLUMN_STEP_NUMBER,i);
             values[i] = cv;
         }
         return values;
@@ -112,6 +114,17 @@ public class BakeItUtils {
         }
 
         return newDescription;
+    }
+
+    public static Step getStepFromContentValues(Cursor cursor){
+
+        int stepId = cursor.getInt(cursor.getColumnIndex(BakeItContract.StepEntry.COLUMN_STEP_NUMBER));
+        String shortDesc = cursor.getString(cursor.getColumnIndex(BakeItContract.StepEntry.COLUMN_SHORT_DESC));
+        String desc = cursor.getString(cursor.getColumnIndex(BakeItContract.StepEntry.COLUMN_DESC));
+        String videoUrl = cursor.getString(cursor.getColumnIndex(BakeItContract.StepEntry.COLUMN_VIDEO_URL));
+        String imageUrl = cursor.getString(cursor.getColumnIndex(BakeItContract.StepEntry.COLUMN_THUMBNAIL_URL));
+
+        return new Step(stepId,shortDesc,desc,videoUrl,imageUrl);
     }
 
 }

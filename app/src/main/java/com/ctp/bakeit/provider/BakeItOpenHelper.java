@@ -10,7 +10,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class BakeItOpenHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     private static final String DATABASE_NAME = "bakeIt.db";
 
@@ -33,6 +33,7 @@ public class BakeItOpenHelper extends SQLiteOpenHelper {
         final String CREATE_TABLE_STEPS = "CREATE TABLE "  + BakeItContract.StepEntry.TABLE_NAME + " (" +
                 BakeItContract.StepEntry._ID                + " INTEGER PRIMARY KEY, " +
                 BakeItContract.StepEntry.COLUMN_RECIPE_ID + " INTEGER NOT NULL, " +
+                BakeItContract.StepEntry.COLUMN_STEP_NUMBER +" INTEGER NOT NULL, "+
                 BakeItContract.StepEntry.COLUMN_SHORT_DESC + " TEXT NOT NULL, "+
                 BakeItContract.StepEntry.COLUMN_DESC + " TEXT NOT NULL, "+
                 BakeItContract.StepEntry.COLUMN_VIDEO_URL + " TEXT, " +
