@@ -10,7 +10,8 @@ import com.ctp.bakeit.fragments.StepDetailFragment;
 import butterknife.BindBool;
 import butterknife.ButterKnife;
 
-public class StepDetailActivity extends AppCompatActivity {
+public class StepDetailActivity extends AppCompatActivity
+            implements StepDetailFragment.StepDetailFragmentCallback{
 
     public static final String INTENT_RECIPE_NAME_EXTRA ="recipe-extra-key";
     public static final String INTENT_RECIPE_ID_EXTRA = "recipe0-id-extra";
@@ -25,7 +26,7 @@ public class StepDetailActivity extends AppCompatActivity {
     @BindBool(R.bool.isLandscape)
     boolean isLandscape;
 
-
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,4 +96,17 @@ public class StepDetailActivity extends AppCompatActivity {
     private void restoreSavedInstanceState(Bundle bundle){
         stepCount = bundle.getInt(INTENT_RECIPE_STEP_COUNT);
     }
+
+
+    @Override
+    public void onNextBtnClicked(int stepId) {
+
+    }
+
+    @Override
+    public void onPrevBtnClicked(int stepId) {
+
+    }
+
+
 }

@@ -23,6 +23,7 @@ import com.ctp.bakeit.StepDetailActivity;
 import com.ctp.bakeit.adapters.RecipeStepsAdapter;
 import com.ctp.bakeit.provider.BakeItContract;
 
+import butterknife.BindBool;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -39,16 +40,19 @@ public class RecipeDetailsFragment extends Fragment
     private static final int CURSOR_LOADER_STEPS_KEY = 201;
     private static final int CURSOR_LOADER_INGREDIENTS_KEY = 301;
     private static final String BUNDLE_QUERY_KEY = "recipe_id_key";
+    private static final String BUNDLE_CLICKED_POSITION_KEY = "bundle-position-key";
 
     private Uri queryUri;
     private String recipeId;
     private String recipeTitle;
-    private boolean isRecyclerViewFocused;
+    private int clickedPosition;
 
     private RecipeDetailsFragmentCallback mCallback;
 
     public interface RecipeDetailsFragmentCallback{
         void onFragmentCreated(String name);
+        void onRecipeDetailsLoaded(int stepCount, String recipeId, boolean isFirstTime);
+        void onRecipeStepClicked(int stepNumber, int stepCount, String recipeId);
     }
 
 
@@ -59,7 +63,11 @@ public class RecipeDetailsFragment extends Fragment
     @BindView(R.id.recipe_details_steps_list)  RecyclerView recipeStepRecyclerView;
     @BindView(R.id.recipe_details_ingredient_item) TextView ingredientItemView;
 
+    @BindBool(R.bool.isTablet)
+    boolean isTablet;
+
     private RecipeStepsAdapter recipeStepsAdapter;
+    private boolean isFirstTime;
 
 
     @Nullable
@@ -67,8 +75,12 @@ public class RecipeDetailsFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.fragment_recipe_details,container,false);
         ButterKnife.bind(this,rootView);
+        isFirstTime = true;
+        clickedPosition = 0;
         if(savedInstanceState!=null){
             queryUri = Uri.parse(savedInstanceState.getString(BUNDLE_QUERY_KEY));
+            isFirstTime = false;
+            clickedPosition = savedInstanceState.getInt(BUNDLE_CLICKED_POSITION_KEY);
         }
 
         recipeId = queryUri.getLastPathSegment();
@@ -148,13 +160,13 @@ public class RecipeDetailsFragment extends Fragment
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         recipeStepsAdapter.swapCursor(null);
-
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(BUNDLE_QUERY_KEY,queryUri.toString());
+        outState.putInt(BUNDLE_CLICKED_POSITION_KEY,clickedPosition);
     }
 
 
@@ -174,8 +186,10 @@ public class RecipeDetailsFragment extends Fragment
     private void setStepsData(Cursor data){
         if(data == null)
             return;
+
+        mCallback.onRecipeDetailsLoaded(data.getCount(),recipeId,isFirstTime);
         if(recipeStepsAdapter==null) {
-            recipeStepsAdapter = new RecipeStepsAdapter(data, this);
+            recipeStepsAdapter = new RecipeStepsAdapter(data, this,isTablet,clickedPosition);
             recipeStepRecyclerView.setAdapter(recipeStepsAdapter);
         }
         else {
@@ -188,14 +202,20 @@ public class RecipeDetailsFragment extends Fragment
     @Override
     public void onRecipeStepClicked(int stepNumber,int count) {
 
-        Intent intent = new Intent(getContext(), StepDetailActivity.class);
+        if(isTablet){
+            clickedPosition = stepNumber;
+            mCallback.onRecipeStepClicked(stepNumber,count,recipeId);
+        }
+        else {
+            Intent intent = new Intent(getContext(), StepDetailActivity.class);
 //        intent.putExtra(StepDetailActivity.)
-        intent.putExtra(StepDetailActivity.INTENT_RECIPE_NAME_EXTRA,recipeTitle);
-        intent.putExtra(StepDetailActivity.INTENT_RECIPE_ID_EXTRA,recipeId);
-        intent.putExtra(StepDetailActivity.INTENT_RECIPE_STEP_NUMBER, stepNumber);
-        intent.putExtra(StepDetailActivity.INTENT_RECIPE_STEP_COUNT,count);
-        Log.d(LOG_TAG,"Step Id is "+stepNumber);
-        startActivity(intent);
+            intent.putExtra(StepDetailActivity.INTENT_RECIPE_NAME_EXTRA, recipeTitle);
+            intent.putExtra(StepDetailActivity.INTENT_RECIPE_ID_EXTRA, recipeId);
+            intent.putExtra(StepDetailActivity.INTENT_RECIPE_STEP_NUMBER, stepNumber);
+            intent.putExtra(StepDetailActivity.INTENT_RECIPE_STEP_COUNT, count);
+            Log.d(LOG_TAG, "Step Id is " + stepNumber);
+            startActivity(intent);
+        }
     }
 
     private void setIngredientsData(Cursor data){

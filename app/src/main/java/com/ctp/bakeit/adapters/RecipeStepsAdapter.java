@@ -23,10 +23,16 @@ public class RecipeStepsAdapter extends RecyclerView.Adapter<RecipeStepsAdapter.
 
     private Cursor cursor;
     private RecipeStepsAdapterCallback callback;
+    private boolean isTablet;
+    private View lastView;
+    private int clickedPosition;
 
-    public RecipeStepsAdapter(Cursor cursor, RecipeStepsAdapterCallback callback) {
+    public RecipeStepsAdapter(Cursor cursor, RecipeStepsAdapterCallback callback,
+                              boolean isTablet, int clickedPosition) {
         this.cursor = cursor;
         this.callback = callback;
+        this.isTablet = isTablet;
+        this.clickedPosition = clickedPosition;
     }
 
     public interface RecipeStepsAdapterCallback{
@@ -44,7 +50,20 @@ public class RecipeStepsAdapter extends RecyclerView.Adapter<RecipeStepsAdapter.
     @Override
     public void onBindViewHolder(RecipeStepsViewHolder holder, int position) {
 
+        /* Small hack to highlight first item by default on tablets */
+        if(isTablet && position ==clickedPosition){
+            /*  If last view is null, this is the first time the view is being set */
+            if(lastView==null) {
+                View v = holder.itemView;
+                v.setBackgroundColor(v.getContext().getResources().getColor(R.color.colorPrimaryLight));
+                lastView = v;
+            }
+        }
+
+        /*  Move cursor to current position */
         cursor.moveToPosition(position);
+
+        /*  Set the information for this row  */
         long id = cursor.getLong(cursor.getColumnIndex(BakeItContract.StepEntry._ID));
         String shortDescription = cursor.getString(
                 cursor.getColumnIndex(BakeItContract.StepEntry.COLUMN_SHORT_DESC));
@@ -76,6 +95,7 @@ public class RecipeStepsAdapter extends RecyclerView.Adapter<RecipeStepsAdapter.
     }
 
 
+
     public class RecipeStepsViewHolder extends RecyclerView.ViewHolder
             implements View.OnClickListener{
 
@@ -93,8 +113,15 @@ public class RecipeStepsAdapter extends RecyclerView.Adapter<RecipeStepsAdapter.
 
         @Override
         public void onClick(View v) {
-            long id = (long)itemView.getTag();
-            callback.onRecipeStepClicked(getAdapterPosition(),cursor.getCount());
+            int position = getAdapterPosition();
+            callback.onRecipeStepClicked(position,cursor.getCount());
+            if(isTablet){
+                if(lastView!=null){
+                    lastView.setBackgroundColor(v.getContext().getResources().getColor(R.color.cardview_light_background));
+                }
+                v.setBackgroundColor(v.getContext().getResources().getColor(R.color.colorPrimaryLight));
+                lastView = v;
+            }
         }
     }
 }

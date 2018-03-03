@@ -26,6 +26,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.ctp.bakeit.R;
+import com.ctp.bakeit.RecipeDetailsActivity;
 import com.ctp.bakeit.StepDetailActivity;
 import com.ctp.bakeit.models.Step;
 import com.ctp.bakeit.provider.BakeItContract;
@@ -75,6 +76,12 @@ public class StepDetailFragment extends Fragment
     @BindBool(R.bool.isLandscape)
     boolean isLandscape;
 
+    @BindBool(R.bool.isPortrait)
+    boolean isPortrait;
+
+    @BindBool(R.bool.isTablet)
+    boolean isTablet;
+
     @BindView(R.id.simpleExoPlayerView)
     SimpleExoPlayerView mSimpleExoPlayerView;
 
@@ -87,7 +94,7 @@ public class StepDetailFragment extends Fragment
     private TextView shortDescriptionView;
     private TextView descriptionView;
 
-//    private StepDetailFragmentCallback mCallback;
+    private StepDetailFragmentCallback mCallback;
 
 
     private SimpleExoPlayer mExoPlayer;
@@ -96,7 +103,7 @@ public class StepDetailFragment extends Fragment
     private int count;
     private long playbackPosition;
     private int currentWindow;
-    private boolean isPlayReady = true;
+    private boolean isPlayReady;
 
     private static MediaSessionCompat mMediaSession;
     private PlaybackStateCompat.Builder mStateBuilder;
@@ -105,9 +112,8 @@ public class StepDetailFragment extends Fragment
 
 
     public interface StepDetailFragmentCallback{
-        void onNextBtnClicked(int stepId);
-        void onPrevBtnClicked(int stepId);
-        void setTitleBarName(String name);
+        void onNextBtnClicked(int stepNumber);
+        void onPrevBtnClicked(int stepNumber);
     }
 
     public StepDetailFragment() {
@@ -132,58 +138,62 @@ public class StepDetailFragment extends Fragment
 
     private void initializePortraidModeWidgets(View rootView) {
 
-        if(!isLandscape){
+        if(isPortrait || isTablet){
             nextBtn = rootView.findViewById(R.id.step_detail_nxt_btn);
             prevBtn = rootView.findViewById(R.id.step_detail_prev_btn);
             stepNumberView = rootView.findViewById(R.id.step_detail_step_number_view);
             shortDescriptionView = rootView.findViewById(R.id.step_detail_short_description);
             descriptionView = rootView.findViewById(R.id.step_detail_description);
-
-            nextBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    onNextBtnClicked();
-
-                }
-            });
-
-            prevBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    onPrevBtnClicked();
-
-                }
-            });
-
-            if(stepNumber==count-1){
-                nextBtn.setEnabled(false);
-                nextBtn.setBackground(getResources().getDrawable(R.drawable.round_corner_grey));
-            }else {
-                nextBtn.setEnabled(true);
+            if(isTablet){
+                nextBtn.setVisibility(View.INVISIBLE);
+                prevBtn.setVisibility(View.INVISIBLE);
             }
+            else {
+                nextBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        onNextBtnClicked();
 
-            if (stepNumber==0){
-                prevBtn.setEnabled(false);
-                prevBtn.setBackground(getResources().getDrawable(R.drawable.round_corner_grey));
+                    }
+                });
+
+                prevBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        onPrevBtnClicked();
+
+                    }
+                });
+
+                if (stepNumber == count - 1) {
+                    nextBtn.setEnabled(false);
+                    nextBtn.setBackground(getResources().getDrawable(R.drawable.round_corner_grey));
+                } else {
+                    nextBtn.setEnabled(true);
+                }
+
+                if (stepNumber == 0) {
+                    prevBtn.setEnabled(false);
+                    prevBtn.setBackground(getResources().getDrawable(R.drawable.round_corner_grey));
+                } else
+                    prevBtn.setEnabled(true);
             }
-            else
-                prevBtn.setEnabled(true);
-
         }
         else {
+
 
         }
     }
 
     private void onNextBtnClicked() {
         int newStep=stepNumber+1;
-//        mCallback.onNextBtnClicked(newStep);
+        mCallback.onNextBtnClicked(newStep);
         replaceFragment(newStep);
     }
 
     private void onPrevBtnClicked(){
         int newStep = stepNumber -1;
-//        mCallback.onPrevBtnClicked(newStep);
+        mCallback.onPrevBtnClicked(newStep);
         replaceFragment(newStep);
     }
 
@@ -217,7 +227,7 @@ public class StepDetailFragment extends Fragment
                         description = thisStep.getDescription();
                     }
 
-                    if(!isLandscape){
+                    if(isPortrait || isTablet){
                         shortDescriptionView.setText(thisStep.getShortDescription());
                         descriptionView.setText(description);
                         stepNumberView.setText(getOutOfStepNumberString());
@@ -236,19 +246,6 @@ public class StepDetailFragment extends Fragment
     }
 
 
-//    @Override
-//    public void onAttach(Context context) {
-//        super.onAttach(context);
-//
-//        // This makes sure that the host activity has implemented the callback interface
-//        // If not, it throws an exception
-//        try {
-//            mCallback = (StepDetailActivity) context;
-//        } catch (ClassCastException e) {
-//            throw new ClassCastException(context.toString()
-//                    + " must implement OnImageClickListener");
-//        }
-//    }
 
     private void initializeImageOrVideoView(Step step){
 
@@ -291,7 +288,7 @@ public class StepDetailFragment extends Fragment
             mExoPlayer = ExoPlayerFactory.newSimpleInstance(new DefaultRenderersFactory(getContext()),
                     trackSelector,loadControl);
             mSimpleExoPlayerView.setPlayer(mExoPlayer);
-            Log.d(TAG, "Current window is "+currentWindow+" | Playback position is "+playbackPosition);
+            Log.d(TAG, "isPlay ready is "+isPlayReady);
             mExoPlayer.setPlayWhenReady(isPlayReady);
             mExoPlayer.seekTo(currentWindow,playbackPosition);
             mExoPlayer.addListener(this);
@@ -326,14 +323,16 @@ public class StepDetailFragment extends Fragment
                Log.d(TAG, "onPlayerStateChanged: PLAYING");
             mStateBuilder.setState(PlaybackStateCompat.STATE_PLAYING,
                     mExoPlayer.getCurrentPosition(), 1f);
+                isPlayReady = true;
              } else if((playbackState == ExoPlayer.STATE_READY)){
                         Log.d(TAG, "onPlayerStateChanged: PAUSED");
             mStateBuilder.setState(PlaybackStateCompat.STATE_PAUSED,
                     mExoPlayer.getCurrentPosition(), 1f);
+                isPlayReady = false;
             }
 
          mMediaSession.setPlaybackState(mStateBuilder.build());
-        showNotification(mStateBuilder.build());
+//        showNotification(mStateBuilder.build());
     }
 
     private void showNotification(PlaybackStateCompat state) {
@@ -471,7 +470,6 @@ public class StepDetailFragment extends Fragment
         if(mExoPlayer!=null) {
             playbackPosition = mExoPlayer.getCurrentPosition();
             currentWindow = mExoPlayer.getCurrentWindowIndex();
-            isPlayReady = mExoPlayer.getPlayWhenReady();
         }
 
         outState.putInt(BUNDLE_STEP_ID_KEY, stepNumber);
@@ -487,6 +485,7 @@ public class StepDetailFragment extends Fragment
         if(savedInstanceState==null){
             playbackPosition=0;
             currentWindow=0;
+            isPlayReady = true;
             return;
         }
         Log.d(TAG,"Restoring instances");
@@ -543,7 +542,7 @@ public class StepDetailFragment extends Fragment
 
     private void releaseResources(){
         if(mExoPlayer!=null) {
-            mNotificationManager.cancelAll();
+//            mNotificationManager.cancelAll();
             mExoPlayer.release();
             mExoPlayer = null;
             mMediaSession.setActive(false);
@@ -557,4 +556,25 @@ public class StepDetailFragment extends Fragment
         Log.d(TAG,"On stop called");
         releaseResources();
     }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        // This makes sure that the host activity has implemented the callback interface
+        // If not, it throws an exception
+        try {
+            mCallback = (StepDetailActivity) context;
+        } catch (ClassCastException e) {
+            try{
+                mCallback = (RecipeDetailsActivity) context;
+            }
+            catch (ClassCastException f){
+                throw new ClassCastException(context.toString()
+                        + " must implement OnImageClickListener");
+            }
+
+        }
+    }
+
 }

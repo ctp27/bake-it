@@ -2,4 +2,5 @@
 <resources>
     <bool name="isTablet">true</bool>
     <bool name="isLandscape">false</bool>
+    <bool name="isPortrait">false</bool>
 </resources>
