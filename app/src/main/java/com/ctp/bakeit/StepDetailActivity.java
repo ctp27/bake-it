@@ -26,7 +26,7 @@ public class StepDetailActivity extends AppCompatActivity
     @BindBool(R.bool.isLandscape)
     boolean isLandscape;
 
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

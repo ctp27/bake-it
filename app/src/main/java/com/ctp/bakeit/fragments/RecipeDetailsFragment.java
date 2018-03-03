@@ -1,25 +1,20 @@
 package com.ctp.bakeit.fragments;
 
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.ctp.bakeit.R;
-import com.ctp.bakeit.StepDetailActivity;
 import com.ctp.bakeit.adapters.RecipeStepsAdapter;
 import com.ctp.bakeit.provider.BakeItContract;
 
@@ -32,27 +27,18 @@ import butterknife.ButterKnife;
  */
 
 public class RecipeDetailsFragment extends Fragment
-        implements LoaderManager.LoaderCallbacks<Cursor>,
-                    RecipeStepsAdapter.RecipeStepsAdapterCallback{
+        implements RecipeStepsAdapter.RecipeStepsAdapterCallback{
 
     private static final String LOG_TAG = RecipeDetailsFragment.class.getSimpleName();
-    private static final int CURSOR_LOADER_RECIPE_KEY = 101;
-    private static final int CURSOR_LOADER_STEPS_KEY = 201;
-    private static final int CURSOR_LOADER_INGREDIENTS_KEY = 301;
-    private static final String BUNDLE_QUERY_KEY = "recipe_id_key";
-    private static final String BUNDLE_CLICKED_POSITION_KEY = "bundle-position-key";
 
-    private Uri queryUri;
-    private String recipeId;
-    private String recipeTitle;
+
+
     private int clickedPosition;
 
     private RecipeDetailsFragmentCallback mCallback;
 
     public interface RecipeDetailsFragmentCallback{
-        void onFragmentCreated(String name);
-        void onRecipeDetailsLoaded(int stepCount, String recipeId, boolean isFirstTime);
-        void onRecipeStepClicked(int stepNumber, int stepCount, String recipeId);
+        void onRecipeStepClicked(int stepNumber, int count);
     }
 
 
@@ -62,12 +48,14 @@ public class RecipeDetailsFragment extends Fragment
 
     @BindView(R.id.recipe_details_steps_list)  RecyclerView recipeStepRecyclerView;
     @BindView(R.id.recipe_details_ingredient_item) TextView ingredientItemView;
+    @BindView(R.id.recipe_details_scroll_view)
+    ScrollView scroller;
 
     @BindBool(R.bool.isTablet)
     boolean isTablet;
 
     private RecipeStepsAdapter recipeStepsAdapter;
-    private boolean isFirstTime;
+
 
 
     @Nullable
@@ -75,25 +63,13 @@ public class RecipeDetailsFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.fragment_recipe_details,container,false);
         ButterKnife.bind(this,rootView);
-        isFirstTime = true;
-        clickedPosition = 0;
-        if(savedInstanceState!=null){
-            queryUri = Uri.parse(savedInstanceState.getString(BUNDLE_QUERY_KEY));
-            isFirstTime = false;
-            clickedPosition = savedInstanceState.getInt(BUNDLE_CLICKED_POSITION_KEY);
-        }
 
-        recipeId = queryUri.getLastPathSegment();
 
         LinearLayoutManager manager = new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false);
         recipeStepRecyclerView.setLayoutManager(manager);
         recipeStepRecyclerView.setHasFixedSize(true);
         recipeStepRecyclerView.setVerticalScrollBarEnabled(false);
-//        recipeStepRecyclerView.setNestedScrollingEnabled(false);
 
-        getLoaderManager().restartLoader(CURSOR_LOADER_RECIPE_KEY,null,this);
-        getLoaderManager().restartLoader(CURSOR_LOADER_INGREDIENTS_KEY,null,this);
-        getLoaderManager().restartLoader(CURSOR_LOADER_STEPS_KEY,null,this);
 
         return rootView;
 
@@ -101,9 +77,7 @@ public class RecipeDetailsFragment extends Fragment
     }
 
 
-    public void setQueryUri(Uri queryUri) {
-        this.queryUri = queryUri;
-    }
+
 
     @Override
     public void onAttach(Context context) {
@@ -120,74 +94,18 @@ public class RecipeDetailsFragment extends Fragment
     }
 
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        switch (id){
-            case CURSOR_LOADER_RECIPE_KEY:
-                return new CursorLoader(getContext(),queryUri,
-                        null,null,null,null);
-            case CURSOR_LOADER_INGREDIENTS_KEY:
-                return new CursorLoader(getContext(), BakeItContract.IngredientEntry.INGREDIENT_CONTENT_URI,
-                        null, BakeItContract.IngredientEntry.COLUMN_RECIPE_ID +"=?",
-                        new String[]{recipeId}, BakeItContract.IngredientEntry._ID+" ASC");
-            case CURSOR_LOADER_STEPS_KEY:
-                return new CursorLoader(getContext(), BakeItContract.StepEntry.STEP_CONTENT_URI,
-                        null, BakeItContract.StepEntry.COLUMN_RECIPE_ID+"=?",
-                        new String[]{recipeId}, BakeItContract.StepEntry._ID +" ASC");
-            default:
-                return null;
-        }
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        int id = loader.getId();
-
-        switch (id){
-            case CURSOR_LOADER_RECIPE_KEY:
-                setRecipeData(data);
-                break;
-            case CURSOR_LOADER_STEPS_KEY:
-                setStepsData(data);
-                break;
-            case CURSOR_LOADER_INGREDIENTS_KEY:
-                setIngredientsData(data);
-                break;
-
-        }
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        recipeStepsAdapter.swapCursor(null);
-    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString(BUNDLE_QUERY_KEY,queryUri.toString());
-        outState.putInt(BUNDLE_CLICKED_POSITION_KEY,clickedPosition);
     }
 
 
-
-    private void setRecipeData(Cursor data){
-        if(data==null) {
-            return;
-        }
-
-        data.moveToFirst();
-        recipeTitle = data.getString(data.getColumnIndex(BakeItContract.RecipeEntry.COLUMN_NAME));
-        mCallback.onFragmentCreated(recipeTitle);
-
-
-    }
-
-    private void setStepsData(Cursor data){
+    public void setStepsData(Cursor data, int clickedPosition, final int scrollX,final int scrollY){
         if(data == null)
             return;
-
-        mCallback.onRecipeDetailsLoaded(data.getCount(),recipeId,isFirstTime);
+        this.clickedPosition = clickedPosition;
+        Log.d(LOG_TAG,"Clicked position is "+clickedPosition);
         if(recipeStepsAdapter==null) {
             recipeStepsAdapter = new RecipeStepsAdapter(data, this,isTablet,clickedPosition);
             recipeStepRecyclerView.setAdapter(recipeStepsAdapter);
@@ -196,29 +114,28 @@ public class RecipeDetailsFragment extends Fragment
             recipeStepsAdapter.swapCursor(data);
         }
 
-    }
+        if(scrollX!=-1 && scrollY !=-1) {
 
+            Log.d(LOG_TAG, " Fragment X offset = "+scrollX +" | Y offset is "+scrollY);
+            scroller.post(new Runnable() {
+                @Override
+                public void run() {
+                    scroller.scrollTo(scrollX,scrollY);
+                }
+            });
+
+        }
+
+    }
 
     @Override
-    public void onRecipeStepClicked(int stepNumber,int count) {
-
-        if(isTablet){
-            clickedPosition = stepNumber;
-            mCallback.onRecipeStepClicked(stepNumber,count,recipeId);
-        }
-        else {
-            Intent intent = new Intent(getContext(), StepDetailActivity.class);
-//        intent.putExtra(StepDetailActivity.)
-            intent.putExtra(StepDetailActivity.INTENT_RECIPE_NAME_EXTRA, recipeTitle);
-            intent.putExtra(StepDetailActivity.INTENT_RECIPE_ID_EXTRA, recipeId);
-            intent.putExtra(StepDetailActivity.INTENT_RECIPE_STEP_NUMBER, stepNumber);
-            intent.putExtra(StepDetailActivity.INTENT_RECIPE_STEP_COUNT, count);
-            Log.d(LOG_TAG, "Step Id is " + stepNumber);
-            startActivity(intent);
-        }
+    public void onRecipeStepClicked(int stepId, int count) {
+        clickedPosition = stepId;
+        mCallback.onRecipeStepClicked(stepId,count);
     }
 
-    private void setIngredientsData(Cursor data){
+
+    public void setIngredientsData(Cursor data){
 
         if(data==null)
             return;
@@ -234,4 +151,18 @@ public class RecipeDetailsFragment extends Fragment
             ingredientItemView.append(finalData);
         }
     }
+
+    public int getClickedPosition() {
+        return clickedPosition;
+    }
+
+    public int getScrollYPosition(){
+        return scroller.getScrollY();
+    }
+
+    public int getScrollXPosition(){
+        return scroller.getScrollX();
+    }
+
+
 }
