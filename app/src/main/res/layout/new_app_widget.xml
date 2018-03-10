@@ -1,0 +1,51 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/colorWhite"
+    android:padding="@dimen/widget_margin"
+    android:id="@+id/widget_whole_layout">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary">
+
+        <TextView
+            android:id="@+id/widget_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:textColor="@color/colorWhite"
+            android:textSize="20sp"
+            android:gravity="center"
+            tools:text="Yellow cookies"
+            />
+
+    </FrameLayout>
+
+    <ListView
+        android:id="@+id/widget_ingredient_list_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@null"
+        android:dividerHeight="0dp">
+    </ListView>
+
+    <RelativeLayout
+        android:id="@+id/widget_default_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <TextView
+        android:layout_marginTop="50dp"
+        android:id="@+id/widget_default_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        />
+
+    </RelativeLayout>
+
+</LinearLayout>

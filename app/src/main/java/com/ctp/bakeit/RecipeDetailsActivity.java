@@ -9,10 +9,12 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 
 import com.ctp.bakeit.fragments.RecipeDetailsFragment;
 import com.ctp.bakeit.fragments.StepDetailFragment;
 import com.ctp.bakeit.provider.BakeItContract;
+import com.ctp.bakeit.widget.IngredientWidgetService;
 
 import butterknife.BindBool;
 import butterknife.ButterKnife;
@@ -134,6 +136,7 @@ public class RecipeDetailsActivity extends AppCompatActivity
                 break;
             case CURSOR_LOADER_INGREDIENTS_KEY:
                 recipeDetailsFragment.setIngredientsData(data);
+                recipeDetailsFragment.setRecipeId(recipeId);
                 break;
 
         }
@@ -182,6 +185,12 @@ public class RecipeDetailsActivity extends AppCompatActivity
     }
 
 
+    @Override
+    public void onAddToWidgetButtonPressed(View v) {
+        IngredientWidgetService.startServiceSetWidget(this,recipeId,recipeTitle);
+//        TextView textView = (TextView) v;
+//        textView.setText("Added");
+    }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {

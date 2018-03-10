@@ -27,8 +27,9 @@
         android:layout_width="3dp"
         android:layout_height="match_parent"
         android:background="@color/color_line_seperator"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@+id/guideline"
-        tools:layout_editor_absoluteY="16dp" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <FrameLayout
         android:id="@+id/step_detail_frame"

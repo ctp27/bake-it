@@ -36,9 +36,11 @@ public class RecipeDetailsFragment extends Fragment
     private int clickedPosition;
 
     private RecipeDetailsFragmentCallback mCallback;
+    private String recipeId;
 
     public interface RecipeDetailsFragmentCallback{
         void onRecipeStepClicked(int stepNumber, int count);
+        void onAddToWidgetButtonPressed(View v);
     }
 
 
@@ -50,6 +52,9 @@ public class RecipeDetailsFragment extends Fragment
     @BindView(R.id.recipe_details_ingredient_item) TextView ingredientItemView;
     @BindView(R.id.recipe_details_scroll_view)
     ScrollView scroller;
+
+    @BindView(R.id.recipe_details_add_to_widget_btn)
+    TextView addToWidgetTextView;
 
     @BindBool(R.bool.isTablet)
     boolean isTablet;
@@ -70,6 +75,13 @@ public class RecipeDetailsFragment extends Fragment
         recipeStepRecyclerView.setHasFixedSize(true);
         recipeStepRecyclerView.setVerticalScrollBarEnabled(false);
 
+        addToWidgetTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mCallback.onAddToWidgetButtonPressed(v);
+
+            }
+        });
 
         return rootView;
 
@@ -164,5 +176,7 @@ public class RecipeDetailsFragment extends Fragment
         return scroller.getScrollX();
     }
 
-
+    public void setRecipeId(String recipeId) {
+        this.recipeId = recipeId;
+    }
 }

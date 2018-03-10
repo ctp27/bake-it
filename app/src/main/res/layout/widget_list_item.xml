@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <TextView
+        android:padding="10dp"
+        android:id="@+id/widget_list_item_quantity"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        tools:text="12 grams"
+        android:layout_weight="1"/>
+
+    <TextView
+        android:id="@+id/widget_list_item_ingredient_name"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        tools:text="Whipped cream"
+        android:padding="10dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_weight="3"/>
+
+</LinearLayout>

@@ -2,22 +2,24 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/recipe_details_scroll_view"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/recipe_details_scroll_view">
+    android:layout_height="match_parent">
 
     <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        >
+        android:layout_height="wrap_content">
 
         <android.support.v7.widget.CardView
             android:id="@+id/recipe_details_ingredients_card_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
             android:layout_marginTop="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -36,8 +38,8 @@
                     android:layout_marginTop="8dp"
                     android:gravity="center"
                     android:text="@string/recipe_details_ingredients_title"
-                    android:textStyle="bold"
                     android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                    android:textStyle="bold"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -55,6 +57,21 @@
                     app:layout_constraintTop_toBottomOf="@+id/recipe_details_ingredients_view_title"
                     tools:text="\u2022 \t 3 Cups Spinach" />
 
+                <TextView
+                    android:id="@+id/recipe_details_add_to_widget_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginBottom="16dp"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/recipe_details_add_to_widget_btn_text"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="15sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="@+id/recipe_details_ingredient_item"
+                    app:layout_constraintTop_toBottomOf="@+id/recipe_details_ingredient_item" />
+
             </android.support.constraint.ConstraintLayout>
 
         </android.support.v7.widget.CardView>
@@ -64,6 +81,10 @@
             android:id="@+id/recipe_details_relative_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/recipe_details_ingredients_card_view">
@@ -88,8 +109,8 @@
                         android:layout_marginTop="16dp"
                         android:gravity="center"
                         android:text="@string/recipe_details_cooking_directions_label"
-                        android:textStyle="bold"
                         android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                        android:textStyle="bold"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
