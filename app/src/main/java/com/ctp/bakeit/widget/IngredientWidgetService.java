@@ -22,6 +22,7 @@ public class IngredientWidgetService extends IntentService {
     private static final String INTENT_RECIPE_ID_EXTRA = "recipe_id_extra";
     private static final String TAG = IngredientWidgetService.class.getSimpleName();
     private static final String INTENT_RECIPE_NAME_EXTRA = "recipe_name_extra";
+    private static final String ACTION_REMOVE_WIDGET = "remove-widget-all";
 
     public IngredientWidgetService() {
         super(IngredientWidgetService.class.getSimpleName());
@@ -42,6 +43,11 @@ public class IngredientWidgetService extends IntentService {
         context.startService(intent);
     }
 
+    public static void startServiceUnpinRecipe(Context context){
+        Intent intent = new Intent(context,IngredientWidgetService.class);
+        intent.setAction(ACTION_REMOVE_WIDGET);
+        context.startService(intent);
+    }
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
@@ -53,9 +59,16 @@ public class IngredientWidgetService extends IntentService {
                 handleActionSetWidget(intent.getStringExtra(INTENT_RECIPE_ID_EXTRA),
                         intent.getStringExtra(INTENT_RECIPE_NAME_EXTRA));
                 break;
+            case ACTION_REMOVE_WIDGET:
+                handleActionRemoveFromWidget();
         }
     }
-    
+
+    private void handleActionRemoveFromWidget() {
+        BakeItPreferences.removeRecipesFromWidget(this);
+        handleActionUpdateWidget();
+    }
+
 
     private void handleActionUpdateWidget(){
         Log.d(TAG,"entered handle Action update widget");

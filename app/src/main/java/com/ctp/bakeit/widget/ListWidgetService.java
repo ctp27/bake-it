@@ -10,6 +10,7 @@ import android.widget.RemoteViewsService;
 import com.ctp.bakeit.R;
 import com.ctp.bakeit.provider.BakeItContract;
 import com.ctp.bakeit.utils.BakeItPreferences;
+import com.ctp.bakeit.utils.BakeItUtils;
 
 /**
  * Created by clinton on 3/9/18.
@@ -66,13 +67,16 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory{
         mCursor.moveToPosition(position);
         float quantity = mCursor.getFloat(
                 mCursor.getColumnIndex(BakeItContract.IngredientEntry.COLUMN_QUANTITY));
+        String quantityString = BakeItUtils.formatIngredientQuantity(Float.toString(quantity));
         String measure = mCursor.getString(
                 mCursor.getColumnIndex(BakeItContract.IngredientEntry.COLUMN_MEASURE));
+        measure = BakeItUtils.formatIngredientMeasure(measure);
         String ingredName = mCursor.getString(
                 mCursor.getColumnIndex(BakeItContract.IngredientEntry.COLUMN_NAME));
+        ingredName = BakeItUtils.getFormattedIngredientName(ingredName);
 
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_list_item);
-        views.setTextViewText(R.id.widget_list_item_quantity,quantity+measure);
+        views.setTextViewText(R.id.widget_list_item_quantity,quantityString+" "+measure);
         views.setTextViewText(R.id.widget_list_item_ingredient_name,ingredName);
         return views;
     }

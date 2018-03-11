@@ -33,5 +33,15 @@ public class BakeItPreferences {
         return sp.getString(PREF_RECIPE_NAME,DEFAULT_VALUE);
     }
 
+    public static boolean isRecipeAddedToWidget(Context context, String recipeId){
+       String storedRecipeId =  getDisplayRecipeId(context);
+       return recipeId.equals(storedRecipeId);
+    }
+
+    public static void removeRecipesFromWidget(Context context){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        sp.edit().remove(PREF_RECIPE_NAME).apply();
+        sp.edit().remove(PREF_RECIPE_KEY).apply();
+    }
 
 }

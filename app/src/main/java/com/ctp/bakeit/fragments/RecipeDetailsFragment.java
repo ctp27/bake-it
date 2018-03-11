@@ -15,8 +15,10 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.ctp.bakeit.R;
+import com.ctp.bakeit.adapters.IngredientListAdapter;
 import com.ctp.bakeit.adapters.RecipeStepsAdapter;
-import com.ctp.bakeit.provider.BakeItContract;
+import com.ctp.bakeit.utils.BakeItPreferences;
+import com.ctp.bakeit.widget.IngredientWidgetService;
 
 import butterknife.BindBool;
 import butterknife.BindView;
@@ -49,12 +51,15 @@ public class RecipeDetailsFragment extends Fragment
     }
 
     @BindView(R.id.recipe_details_steps_list)  RecyclerView recipeStepRecyclerView;
-    @BindView(R.id.recipe_details_ingredient_item) TextView ingredientItemView;
+    @BindView(R.id.recipe_details_ingredient_list) RecyclerView ingredientsRecyclerView;
     @BindView(R.id.recipe_details_scroll_view)
     ScrollView scroller;
 
     @BindView(R.id.recipe_details_add_to_widget_btn)
     TextView addToWidgetTextView;
+
+    @BindView(R.id.recipe_details_unpin_widget_btn)
+    TextView removeWidgetButton;
 
     @BindBool(R.bool.isTablet)
     boolean isTablet;
@@ -75,13 +80,28 @@ public class RecipeDetailsFragment extends Fragment
         recipeStepRecyclerView.setHasFixedSize(true);
         recipeStepRecyclerView.setVerticalScrollBarEnabled(false);
 
+        LinearLayoutManager manager2 = new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false);
+        ingredientsRecyclerView.setLayoutManager(manager2);
+        ingredientsRecyclerView.setHasFixedSize(true);
+        recipeStepRecyclerView.setVerticalScrollBarEnabled(false);
+
         addToWidgetTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mCallback.onAddToWidgetButtonPressed(v);
-
+                displayUnpinWidgetButton();
             }
         });
+
+        removeWidgetButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                IngredientWidgetService.startServiceUnpinRecipe(getContext());
+                displayPinWidgetButton();
+            }
+        });
+
+
 
         return rootView;
 
@@ -151,17 +171,8 @@ public class RecipeDetailsFragment extends Fragment
 
         if(data==null)
             return;
-
-        while(data.moveToNext()){
-            float quantity = data.getFloat(
-                    data.getColumnIndex(BakeItContract.IngredientEntry.COLUMN_QUANTITY));
-            String measure = data.getString(
-                    data.getColumnIndex(BakeItContract.IngredientEntry.COLUMN_MEASURE));
-            String ingredName = data.getString(
-                    data.getColumnIndex(BakeItContract.IngredientEntry.COLUMN_NAME));
-            String finalData = "\u2022 \t"+quantity+measure +" - "+ingredName+"\n\n";
-            ingredientItemView.append(finalData);
-        }
+        IngredientListAdapter adapter = new IngredientListAdapter(data);
+        ingredientsRecyclerView.setAdapter(adapter);
     }
 
     public int getClickedPosition() {
@@ -178,5 +189,22 @@ public class RecipeDetailsFragment extends Fragment
 
     public void setRecipeId(String recipeId) {
         this.recipeId = recipeId;
+        if(BakeItPreferences.isRecipeAddedToWidget(getContext(),recipeId)){
+            displayUnpinWidgetButton();
+        }
+        else {
+            displayPinWidgetButton();
+        }
+
+    }
+
+    private void displayUnpinWidgetButton() {
+        removeWidgetButton.setVisibility(View.VISIBLE);
+        addToWidgetTextView.setVisibility(View.INVISIBLE);
+    }
+
+    private void displayPinWidgetButton() {
+        addToWidgetTextView.setVisibility(View.VISIBLE);
+        removeWidgetButton.setVisibility(View.INVISIBLE);
     }
 }

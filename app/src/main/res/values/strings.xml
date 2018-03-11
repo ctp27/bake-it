@@ -8,8 +8,11 @@
     <string name="pause_btn_content_desc">Pause button</string>
     <string name="play_btn_content_desc">Play Button</string>
     <string name="image_thumbnail_content_desc">Instruction Image</string>
-    <string name="recipe_details_add_to_widget_btn_text">ADD TO WIDGET</string>
+    <string name="recipe_details_add_to_widget_btn_text">PIN TO WIDGET</string>
+    <string name="recipe_details_unpin_widget_text">UNPIN FROM WIDGET</string>
     <string name="appwidget_text">EXAMPLE</string>
     <string name="add_widget">Add widget</string>
     <string name="default_widget_text">No Recipe selected for display</string>
+    <string name="ingredient_list_item_hyphen">--</string>
+    <string name="widget_default_text_view">Pinned Recipe ingredients will appear here</string>
 </resources>

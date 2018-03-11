@@ -127,4 +127,44 @@ public class BakeItUtils {
         return new Step(stepId,shortDesc,desc,videoUrl,imageUrl);
     }
 
+
+    public static String formatIngredientQuantity(String quantity){
+        int indexOfDecimal = quantity.indexOf('.');
+        int numberAfterDecimal = Integer.parseInt(quantity.substring(indexOfDecimal+1));
+
+        if(numberAfterDecimal==0){
+            return quantity.substring(0,indexOfDecimal);
+        }
+        return quantity;
+    }
+
+    public static String formatIngredientMeasure(String measure){
+
+        switch (measure){
+            case "G":
+                return "g";
+            case "KG":
+                return "kg";
+            case "UNIT":
+                return "";
+            case "TBLSP":
+                return "tbsp";
+            case "TSP":
+                return "tsp";
+            case "CUP":
+                return "cup";
+            case "OZ":
+                return "oz";
+            default:
+                return measure;
+        }
+
+    }
+
+    public static String getFormattedIngredientName(String ingredientName){
+        return ingredientName.substring(0, 1).toUpperCase() + ingredientName.substring(1);
+    }
+
+
+
 }

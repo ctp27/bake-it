@@ -10,6 +10,7 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 
 import com.ctp.bakeit.fragments.RecipeDetailsFragment;
 import com.ctp.bakeit.fragments.StepDetailFragment;
@@ -70,9 +71,8 @@ public class RecipeDetailsActivity extends AppCompatActivity
 
             /* Set the queryUri for the fragment*/
 
-
             getSupportFragmentManager().beginTransaction().
-                    add(R.id.recipe_details_fragment, recipeDetailsFragment)
+                    replace(R.id.recipe_details_fragment, recipeDetailsFragment)
                     .commit();
 
 
@@ -188,8 +188,8 @@ public class RecipeDetailsActivity extends AppCompatActivity
     @Override
     public void onAddToWidgetButtonPressed(View v) {
         IngredientWidgetService.startServiceSetWidget(this,recipeId,recipeTitle);
-//        TextView textView = (TextView) v;
-//        textView.setText("Added");
+        TextView textView = (TextView) v;
+        textView.setText("Added");
     }
 
     @Override

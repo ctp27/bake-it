@@ -69,9 +69,10 @@ public class IngredientListWidget extends AppWidgetProvider {
                     .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
             Intent intent = new Intent(context, ListWidgetService.class);
             views.setRemoteAdapter(R.id.widget_ingredient_list_text_view, intent);
-            views.setEmptyView(R.id.widget_ingredient_list_text_view, R.id.widget_default_view);
+
         }
         views.setTextViewText(R.id.widget_title,recipeName);
+        views.setEmptyView(R.id.widget_ingredient_list_text_view, R.id.widget_default_view);
         views.setOnClickPendingIntent(R.id.widget_whole_layout, appPendingIntent);
         // Handle empty gardens
 

@@ -39,8 +39,10 @@
         android:layout_height="match_parent">
 
     <TextView
-        android:layout_marginTop="50dp"
+        android:layout_margin="10dp"
         android:id="@+id/widget_default_text"
+        android:textColor="@color/colorAccent"
+        android:text="@string/widget_default_text_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"

@@ -7,11 +7,13 @@
     android:orientation="horizontal">
 
     <TextView
-        android:padding="10dp"
+        android:layout_margin="10dp"
         android:id="@+id/widget_list_item_quantity"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         tools:text="12 grams"
+        android:textSize="18sp"
+        android:textStyle="bold"
         android:layout_weight="1"/>
 
     <TextView
@@ -20,8 +22,7 @@
         android:layout_height="match_parent"
         tools:text="Whipped cream"
         android:padding="10dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp"
+        android:textSize="18sp"
         android:layout_weight="3"/>
 
 </LinearLayout>
