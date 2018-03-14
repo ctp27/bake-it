@@ -151,4 +151,36 @@
     </ScrollView>
 
 
+    <TextView
+        android:id="@+id/no_internet_message"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/no_internet_message_text"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/horizontalHalf"
+        android:gravity="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/step_thumbnail"
+        android:visibility="invisible"/>
+
+    <Button
+        android:id="@+id/refresh_media_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/refresh_btn_txt"
+        android:background="@color/colorAccent"
+        android:textColor="@color/colorWhite"
+        app:layout_constraintEnd_toEndOf="@+id/no_internet_message"
+        app:layout_constraintStart_toStartOf="@+id/no_internet_message"
+        app:layout_constraintTop_toBottomOf="@+id/no_internet_message"
+        android:visibility="invisible"/>
+
 </android.support.constraint.ConstraintLayout>

@@ -1,7 +1,10 @@
 package com.ctp.bakeit.utils;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 
 import com.ctp.bakeit.models.Ingredient;
 import com.ctp.bakeit.models.Recipe;
@@ -163,6 +166,21 @@ public class BakeItUtils {
 
     public static String getFormattedIngredientName(String ingredientName){
         return ingredientName.substring(0, 1).toUpperCase() + ingredientName.substring(1);
+    }
+
+
+    public static boolean isConnectedToInternet(Context context){
+
+        ConnectivityManager cm =
+                (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = null;
+        if(cm!=null) {
+          activeNetwork = cm.getActiveNetworkInfo();
+        }
+
+        return activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+
     }
 
 

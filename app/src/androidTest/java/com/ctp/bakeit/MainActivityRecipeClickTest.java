@@ -47,7 +47,6 @@ public class MainActivityRecipeClickTest {
     @Test
     public void clickListItem_OpensRecipeDetails(){
 
-
         onView(ViewMatchers.withId(R.id.recipes_recycler_view))
                 .perform(RecyclerViewActions.actionOnItemAtPosition(1,click()));
 

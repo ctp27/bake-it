@@ -13,6 +13,7 @@ import android.support.test.runner.AndroidJUnit4;
 import com.ctp.bakeit.provider.BakeItContract;
 
 import org.hamcrest.core.AllOf;
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -66,6 +67,11 @@ public class RecipeDetailsActivityStepClickTest {
         }
 
 
+    }
+
+    @After
+    public void unregisterIdlingResources(){
+        Espresso.unregisterIdlingResources(mIdlingResource);
     }
 
 }

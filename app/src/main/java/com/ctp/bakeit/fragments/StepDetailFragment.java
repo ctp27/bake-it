@@ -1,7 +1,6 @@
 package com.ctp.bakeit.fragments;
 
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -9,9 +8,9 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.media.session.MediaButtonReceiver;
@@ -21,6 +20,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -88,6 +88,14 @@ public class StepDetailFragment extends Fragment
     @BindView(R.id.step_thumbnail)
     ImageView thumbnailImage;
 
+    @BindView(R.id.no_internet_message)
+    TextView errorTextView;
+
+    @BindView(R.id.refresh_media_btn)
+    Button refreshBtn;
+
+    private ConstraintLayout landscapeConstraintLayout;
+
     private ImageButton nextBtn;
     private ImageButton prevBtn;
     private TextView stepNumberView;
@@ -116,6 +124,8 @@ public class StepDetailFragment extends Fragment
         void onPrevBtnClicked(int stepNumber);
     }
 
+
+
     public StepDetailFragment() {
 
     }
@@ -129,6 +139,13 @@ public class StepDetailFragment extends Fragment
         ButterKnife.bind(this,rootView);
         restoreVariablesIfSavedBundle(savedInstanceState);
         initializePortraidModeWidgets(rootView);
+
+        refreshBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getLoaderManager().restartLoader(CURSOR_STEP_LOADER,null,StepDetailFragment.this);
+            }
+        });
 
         getLoaderManager().restartLoader(CURSOR_STEP_LOADER,null,this);
 
@@ -181,6 +198,7 @@ public class StepDetailFragment extends Fragment
         }
         else {
 
+            landscapeConstraintLayout = (ConstraintLayout) rootView.findViewById(R.id.land_error_constraints);
 
         }
     }
@@ -249,6 +267,13 @@ public class StepDetailFragment extends Fragment
 
     private void initializeImageOrVideoView(Step step){
 
+        if(!BakeItUtils.isConnectedToInternet(getContext())){
+            displayErrorMessage();
+            return;
+        }
+
+        hideErrorMessage();
+
         String videoUrl = step.getVideoURL();
         String imgUrl = step.getThumbnailURL();
 
@@ -262,6 +287,24 @@ public class StepDetailFragment extends Fragment
 
         }
 
+    }
+
+    private void displayErrorMessage() {
+        mSimpleExoPlayerView.setVisibility(View.INVISIBLE);
+        if(isLandscape){
+            landscapeConstraintLayout.setVisibility(View.VISIBLE);
+        }
+        errorTextView.setVisibility(View.VISIBLE);
+        refreshBtn.setVisibility(View.VISIBLE);
+    }
+
+    private void hideErrorMessage(){
+        mSimpleExoPlayerView.setVisibility(View.VISIBLE);
+        errorTextView.setVisibility(View.INVISIBLE);
+        refreshBtn.setVisibility(View.INVISIBLE);
+        if(isLandscape){
+            landscapeConstraintLayout.setVisibility(View.INVISIBLE);
+        }
     }
 
 
@@ -332,52 +375,7 @@ public class StepDetailFragment extends Fragment
             }
 
          mMediaSession.setPlaybackState(mStateBuilder.build());
-//        showNotification(mStateBuilder.build());
     }
-
-    private void showNotification(PlaybackStateCompat state) {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext());
-
-        int icon;
-        String play_pause;
-        if(state.getState() == PlaybackStateCompat.STATE_PLAYING){
-            icon = R.drawable.exo_controls_pause;
-            play_pause = "Pause";
-        } else {
-            icon = R.drawable.exo_controls_play;
-            play_pause = "Play";
-        }
-
-
-        NotificationCompat.Action playPauseAction = new NotificationCompat.Action(
-                icon, play_pause,
-                MediaButtonReceiver.buildMediaButtonPendingIntent(getContext(),
-                        PlaybackStateCompat.ACTION_PLAY_PAUSE));
-
-        NotificationCompat.Action restartAction = new android.support.v4.app.NotificationCompat
-                .Action(R.drawable.exo_controls_previous, "Restart",
-                MediaButtonReceiver.buildMediaButtonPendingIntent
-                        (getContext(), PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS));
-
-        PendingIntent contentPendingIntent = PendingIntent.getActivity
-                (getContext(), 0, new Intent(getContext(), StepDetailActivity.class), 0);
-
-        builder.setContentTitle("Media Player")
-                .setContentText("Step "+(stepNumber+1))
-                .setContentIntent(contentPendingIntent)
-                .setSmallIcon(R.drawable.ic_music_note_black_24dp)
-                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .addAction(restartAction)
-                .addAction(playPauseAction)
-                .setStyle(new android.support.v4.media.app.NotificationCompat.MediaStyle()
-                        .setMediaSession(mMediaSession.getSessionToken())
-                        .setShowActionsInCompactView(0,1));
-
-
-        mNotificationManager = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.notify(0, builder.build());
-    }
-
 
 
     private void initializeMediaSession() {

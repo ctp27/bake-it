@@ -18,4 +18,6 @@
     <string name="step_thumbnail_imgView_content_desc">Image for instruction</string>
     <string name="back_navigate_content_desc">Navigate to previous step button</string>
     <string name="next_btn_content_desc">Navigate to next step</string>
+    <string name="no_internet_message_text">Media not available when offline</string>
+    <string name="refresh_btn_txt">Refresh</string>
 </resources>
