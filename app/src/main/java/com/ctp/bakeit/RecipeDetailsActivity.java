@@ -36,6 +36,7 @@ public class RecipeDetailsActivity extends AppCompatActivity
     private static final String BUNDLE_SCROLL_X_KEY = "bundle-scroller-off";
     private static final String LOG_TAG = RecipeDetailsActivity.class.getSimpleName();
     private static final String BUNDLE_SCROLL_Y_KEY = "bundle-scroller-y" ;
+    private static final String BUNDLE_IS_FIRST_TIME = "bundle-is-first-time";
 
     private String recipeId;
     private String recipeTitle;
@@ -65,7 +66,7 @@ public class RecipeDetailsActivity extends AppCompatActivity
             clickedPosition = savedInstanceState.getInt(BUNDLE_CLICKED_POSITION_KEY);
             scrollXOffset = savedInstanceState.getInt(BUNDLE_SCROLL_X_KEY);
             scrollYOffset = savedInstanceState.getInt(BUNDLE_SCROLL_Y_KEY);
-            isFirstTime = false;
+            isFirstTime = savedInstanceState.getBoolean(BUNDLE_IS_FIRST_TIME);
         }
             Intent recievedIntent = getIntent();
             if (recievedIntent != null) {
@@ -218,6 +219,19 @@ public class RecipeDetailsActivity extends AppCompatActivity
         outState.putInt(BUNDLE_CLICKED_POSITION_KEY,clickedPosition);
         outState.putInt(BUNDLE_SCROLL_X_KEY, scrollXOffset);
         outState.putInt(BUNDLE_SCROLL_Y_KEY,scrollYOffset);
+        outState.putBoolean(BUNDLE_IS_FIRST_TIME,isFirstTime);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        isFirstTime = false;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        isFirstTime = false;
     }
 
     @VisibleForTesting
