@@ -15,4 +15,7 @@
     <string name="default_widget_text">No Recipe selected for display</string>
     <string name="ingredient_list_item_hyphen">--</string>
     <string name="widget_default_text_view">Pinned Recipe ingredients will appear here</string>
+    <string name="step_thumbnail_imgView_content_desc">Image for instruction</string>
+    <string name="back_navigate_content_desc">Navigate to previous step button</string>
+    <string name="next_btn_content_desc">Navigate to next step</string>
 </resources>

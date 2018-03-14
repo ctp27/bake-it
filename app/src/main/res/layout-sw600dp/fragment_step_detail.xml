@@ -25,7 +25,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:visibility="invisible"
-        />
+        android:contentDescription="@string/step_thumbnail_imgView_content_desc" />
 
     <android.support.constraint.Guideline
         android:id="@+id/horizontalHalf"
@@ -56,7 +56,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/threeFourthHalf"
-        app:srcCompat="@drawable/ic_navigate_before_white_24dp" />
+        app:srcCompat="@drawable/ic_navigate_before_white_24dp"
+        android:contentDescription="@string/prev_btn_content_desc" />
 
     <TextView
         android:id="@+id/step_detail_step_number_view"
@@ -86,7 +87,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/threeFourthHalf"
-        app:srcCompat="@drawable/ic_navigate_next_white_24dp" />
+        app:srcCompat="@drawable/ic_navigate_next_white_24dp"
+        android:contentDescription="@string/next_btn_content_desc" />
 
     <ScrollView
         android:id="@+id/card_scroller"
@@ -141,9 +143,6 @@
                 </LinearLayout>
 
             </android.support.v7.widget.CardView>
-
-
-
 
     </ScrollView>
 

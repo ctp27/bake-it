@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.ctp.bakeit.R;
 import com.ctp.bakeit.adapters.IngredientListAdapter;
 import com.ctp.bakeit.adapters.RecipeStepsAdapter;
+import com.ctp.bakeit.idlingresource.TestIdlingResource;
 import com.ctp.bakeit.utils.BakeItPreferences;
 import com.ctp.bakeit.widget.IngredientWidgetService;
 
@@ -32,8 +33,6 @@ public class RecipeDetailsFragment extends Fragment
         implements RecipeStepsAdapter.RecipeStepsAdapterCallback{
 
     private static final String LOG_TAG = RecipeDetailsFragment.class.getSimpleName();
-
-
 
     private int clickedPosition;
 
@@ -73,41 +72,9 @@ public class RecipeDetailsFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.fragment_recipe_details,container,false);
         ButterKnife.bind(this,rootView);
-
-
-        LinearLayoutManager manager = new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false);
-        recipeStepRecyclerView.setLayoutManager(manager);
-        recipeStepRecyclerView.setHasFixedSize(true);
-        recipeStepRecyclerView.setVerticalScrollBarEnabled(false);
-
-        LinearLayoutManager manager2 = new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false);
-        ingredientsRecyclerView.setLayoutManager(manager2);
-        ingredientsRecyclerView.setHasFixedSize(true);
-        recipeStepRecyclerView.setVerticalScrollBarEnabled(false);
-
-        addToWidgetTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mCallback.onAddToWidgetButtonPressed(v);
-                displayUnpinWidgetButton();
-            }
-        });
-
-        removeWidgetButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                IngredientWidgetService.startServiceUnpinRecipe(getContext());
-                displayPinWidgetButton();
-            }
-        });
-
-
-
+        initializeWidgets();
         return rootView;
-
-
     }
-
 
 
 
@@ -133,7 +100,9 @@ public class RecipeDetailsFragment extends Fragment
     }
 
 
-    public void setStepsData(Cursor data, int clickedPosition, final int scrollX,final int scrollY){
+
+
+    public void setStepsData(Cursor data, int clickedPosition, final int scrollX, final int scrollY, TestIdlingResource mIdlingResource){
         if(data == null)
             return;
         this.clickedPosition = clickedPosition;
@@ -158,6 +127,11 @@ public class RecipeDetailsFragment extends Fragment
 
         }
 
+        /*  For testing purposes    */
+        if(mIdlingResource!=null) {
+            mIdlingResource.setIdleState(true);
+        }
+
     }
 
     @Override
@@ -173,6 +147,40 @@ public class RecipeDetailsFragment extends Fragment
             return;
         IngredientListAdapter adapter = new IngredientListAdapter(data);
         ingredientsRecyclerView.setAdapter(adapter);
+    }
+
+
+    private void initializeWidgets() {
+
+        LinearLayoutManager recipeStepsLayoutManager =
+                new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false);
+
+        recipeStepRecyclerView.setLayoutManager(recipeStepsLayoutManager);
+        recipeStepRecyclerView.setHasFixedSize(true);
+        recipeStepRecyclerView.setVerticalScrollBarEnabled(false);
+
+        LinearLayoutManager ingredientLayoutManager =
+                new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false);
+
+        ingredientsRecyclerView.setLayoutManager(ingredientLayoutManager);
+        ingredientsRecyclerView.setHasFixedSize(true);
+        recipeStepRecyclerView.setVerticalScrollBarEnabled(false);
+
+        addToWidgetTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mCallback.onAddToWidgetButtonPressed(v);
+                displayUnpinWidgetButton();
+            }
+        });
+
+        removeWidgetButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                IngredientWidgetService.startServiceUnpinRecipe(getContext());
+                displayPinWidgetButton();
+            }
+        });
     }
 
     public int getClickedPosition() {

@@ -84,6 +84,7 @@ public class IngredientListWidget extends AppWidgetProvider {
     @Override
     public void onEnabled(Context context) {
         // Enter relevant functionality for when the first widget is created
+        IngredientWidgetService.startServiceUpdateWidget(context);
     }
 
     @Override

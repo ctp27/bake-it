@@ -4,6 +4,10 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
+import android.support.test.espresso.IdlingResource;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +16,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import com.ctp.bakeit.adapters.RecipeAdapter;
+import com.ctp.bakeit.idlingresource.TestIdlingResource;
 import com.ctp.bakeit.provider.BakeItContract;
 import com.ctp.bakeit.sync.BakeItSyncUtils;
 
@@ -30,6 +35,9 @@ public class MainActivity extends AppCompatActivity
     private RecipeAdapter mRecipeAdapter;
 
     @BindView(R.id.recipes_recycler_view)  RecyclerView recipeRecyclerView;
+
+    @Nullable
+    private TestIdlingResource mIdlingResource;
 
 
 
@@ -52,7 +60,7 @@ public class MainActivity extends AppCompatActivity
             recipeRecyclerView.setLayoutManager(layoutManager);
         }
 
-        getSupportLoaderManager().restartLoader(RECIPE_CURSOR_LOADER_ID,null, this);
+
 
         BakeItSyncUtils.initialize(this);
     }
@@ -62,6 +70,9 @@ public class MainActivity extends AppCompatActivity
     public android.support.v4.content.Loader<Cursor> onCreateLoader(int id, Bundle args) {
         switch (id){
             case RECIPE_CURSOR_LOADER_ID:
+                if(mIdlingResource!=null){
+                    mIdlingResource.setIdleState(false);
+                }
                 return new CursorLoader(this, BakeItContract.RecipeEntry.RECIPE_CONTENT_URI,
                         null,null,null, BakeItContract.RecipeEntry.COLUMN_RECIPE_ID+" ASC");
         }
@@ -70,6 +81,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onLoadFinished(android.support.v4.content.Loader<Cursor> loader, Cursor data) {
+
         if(data==null)
             return;
         if(mRecipeAdapter==null) {
@@ -78,6 +90,10 @@ public class MainActivity extends AppCompatActivity
         }
         else {
             mRecipeAdapter.swapCursor(data);
+        }
+
+        if(mIdlingResource!=null){
+            mIdlingResource.setIdleState(true);
         }
     }
 
@@ -97,6 +113,21 @@ public class MainActivity extends AppCompatActivity
         intent.setData(uri);
         startActivity(intent);
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getSupportLoaderManager().restartLoader(RECIPE_CURSOR_LOADER_ID,null, this);
+    }
+
+    @VisibleForTesting
+    @NonNull
+    public IdlingResource getIdlingResource() {
+        if (mIdlingResource == null) {
+            mIdlingResource = new TestIdlingResource();
+        }
+        return mIdlingResource;
     }
 
 }

@@ -4,6 +4,9 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
+import android.support.test.espresso.IdlingResource;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -14,6 +17,7 @@ import android.widget.TextView;
 
 import com.ctp.bakeit.fragments.RecipeDetailsFragment;
 import com.ctp.bakeit.fragments.StepDetailFragment;
+import com.ctp.bakeit.idlingresource.TestIdlingResource;
 import com.ctp.bakeit.provider.BakeItContract;
 import com.ctp.bakeit.widget.IngredientWidgetService;
 
@@ -39,6 +43,8 @@ public class RecipeDetailsActivity extends AppCompatActivity
     private int scrollXOffset =-1;
 
     private boolean isFirstTime=true;
+
+    private TestIdlingResource mIdlingResource;
 
     @BindBool(R.bool.isTablet)
     boolean isTablet;
@@ -76,12 +82,18 @@ public class RecipeDetailsActivity extends AppCompatActivity
                     .commit();
 
 
-        getSupportLoaderManager().restartLoader(CURSOR_LOADER_RECIPE_KEY,null,this);
-        getSupportLoaderManager().restartLoader(CURSOR_LOADER_INGREDIENTS_KEY,null,this);
-        getSupportLoaderManager().restartLoader(CURSOR_LOADER_STEPS_KEY,null,this);
+
     }
 
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        getSupportLoaderManager().restartLoader(CURSOR_LOADER_RECIPE_KEY,null,this);
+        getSupportLoaderManager().restartLoader(CURSOR_LOADER_INGREDIENTS_KEY,null,this);
+        getSupportLoaderManager().restartLoader(CURSOR_LOADER_STEPS_KEY,null,this);
+
+    }
 
     @Override
     public void onNextBtnClicked(int stepNumber) {
@@ -105,6 +117,9 @@ public class RecipeDetailsActivity extends AppCompatActivity
                         null, BakeItContract.IngredientEntry.COLUMN_RECIPE_ID +"=?",
                         new String[]{recipeId}, BakeItContract.IngredientEntry._ID+" ASC");
             case CURSOR_LOADER_STEPS_KEY:
+                if(mIdlingResource!=null){
+                    mIdlingResource.setIdleState(false);
+                }
                 return new CursorLoader(this, BakeItContract.StepEntry.STEP_CONTENT_URI,
                         null, BakeItContract.StepEntry.COLUMN_RECIPE_ID+"=?",
                         new String[]{recipeId}, BakeItContract.StepEntry._ID +" ASC");
@@ -122,7 +137,7 @@ public class RecipeDetailsActivity extends AppCompatActivity
                 setRecipeData(data);
                 break;
             case CURSOR_LOADER_STEPS_KEY:
-                recipeDetailsFragment.setStepsData(data,clickedPosition, scrollXOffset,scrollYOffset);
+                recipeDetailsFragment.setStepsData(data,clickedPosition, scrollXOffset,scrollYOffset,mIdlingResource);
                 if(isTablet && isFirstTime){
                     StepDetailFragment stepDetailFragment = new StepDetailFragment();
                     stepDetailFragment.setCount(data.getCount());
@@ -151,11 +166,12 @@ public class RecipeDetailsActivity extends AppCompatActivity
         data.moveToFirst();
         recipeTitle = data.getString(data.getColumnIndex(BakeItContract.RecipeEntry.COLUMN_NAME));
         getSupportActionBar().setTitle(recipeTitle);
+
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        recipeDetailsFragment.setStepsData(null,0, scrollXOffset,scrollYOffset);
+        recipeDetailsFragment.setStepsData(null,0, scrollXOffset,scrollYOffset,mIdlingResource);
     }
 
 
@@ -202,5 +218,14 @@ public class RecipeDetailsActivity extends AppCompatActivity
         outState.putInt(BUNDLE_CLICKED_POSITION_KEY,clickedPosition);
         outState.putInt(BUNDLE_SCROLL_X_KEY, scrollXOffset);
         outState.putInt(BUNDLE_SCROLL_Y_KEY,scrollYOffset);
+    }
+
+    @VisibleForTesting
+    @NonNull
+    public IdlingResource getIdlingResource() {
+        if (mIdlingResource == null) {
+            mIdlingResource = new TestIdlingResource();
+        }
+        return mIdlingResource;
     }
 }

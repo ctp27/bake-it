@@ -1,11 +1,11 @@
 package com.ctp.bakeit.widget;
 
-import android.app.IntentService;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.Nullable;
+import android.support.annotation.NonNull;
+import android.support.v4.app.JobIntentService;
 import android.util.Log;
 
 import com.ctp.bakeit.R;
@@ -15,7 +15,7 @@ import com.ctp.bakeit.utils.BakeItPreferences;
  * Created by clinton on 3/9/18.
  */
 
-public class IngredientWidgetService extends IntentService {
+public class IngredientWidgetService extends JobIntentService {
 
     public static final String ACTION_UPDATE_INGREDIENT_WIDGET = "update-plant-widget";
     public static final String ACTION_SET_WIDGET = "set-widget-action";
@@ -24,15 +24,20 @@ public class IngredientWidgetService extends IntentService {
     private static final String INTENT_RECIPE_NAME_EXTRA = "recipe_name_extra";
     private static final String ACTION_REMOVE_WIDGET = "remove-widget-all";
 
+    private static final int JOB_ID_UPDATE_WIDGET= 1011;
+    private static final int JOB_ID_SET_WIDGET= 1012;
+    private static final int JOB_ID_REMOVE_WIDGET= 1013;
+
+
     public IngredientWidgetService() {
-        super(IngredientWidgetService.class.getSimpleName());
+
     }
 
 
     public static void startServiceUpdateWidget(Context context){
         Intent intent = new Intent(context,IngredientWidgetService.class);
         intent.setAction(ACTION_UPDATE_INGREDIENT_WIDGET);
-        context.startService(intent);
+        enqueueWork(context,IngredientWidgetService.class,JOB_ID_UPDATE_WIDGET,intent);
     }
 
     public static void startServiceSetWidget(Context context, String recipeId, String recipeName){
@@ -40,17 +45,19 @@ public class IngredientWidgetService extends IntentService {
         intent.setAction(ACTION_SET_WIDGET);
         intent.putExtra(INTENT_RECIPE_ID_EXTRA,recipeId);
         intent.putExtra(INTENT_RECIPE_NAME_EXTRA,recipeName);
-        context.startService(intent);
+        enqueueWork(context,IngredientWidgetService.class,JOB_ID_UPDATE_WIDGET,intent);
     }
 
     public static void startServiceUnpinRecipe(Context context){
         Intent intent = new Intent(context,IngredientWidgetService.class);
         intent.setAction(ACTION_REMOVE_WIDGET);
-        context.startService(intent);
+        enqueueWork(context,IngredientWidgetService.class,JOB_ID_UPDATE_WIDGET,intent);
     }
 
+
     @Override
-    protected void onHandleIntent(@Nullable Intent intent) {
+    protected void onHandleWork(@NonNull Intent intent) {
+
         switch (intent.getAction()){
             case ACTION_UPDATE_INGREDIENT_WIDGET:
                 handleActionUpdateWidget();
@@ -61,6 +68,7 @@ public class IngredientWidgetService extends IntentService {
                 break;
             case ACTION_REMOVE_WIDGET:
                 handleActionRemoveFromWidget();
+                break;
         }
     }
 
@@ -77,7 +85,8 @@ public class IngredientWidgetService extends IntentService {
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
         int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this, IngredientListWidget.class));
         appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.widget_ingredient_list_text_view);
-        IngredientListWidget.updateIngredientWidgets(this,appWidgetManager,recipeName,id,appWidgetIds);
+        IngredientListWidget.updateIngredientWidgets(this
+                ,appWidgetManager,recipeName,id,appWidgetIds);
 
     }
 
