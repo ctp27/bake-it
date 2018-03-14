@@ -1,6 +1,5 @@
 package com.ctp.bakeit.fragments;
 
-import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -48,6 +47,7 @@ import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
+import com.google.android.exoplayer2.util.Util;
 import com.squareup.picasso.Picasso;
 
 import butterknife.BindBool;
@@ -115,7 +115,6 @@ public class StepDetailFragment extends Fragment
 
     private static MediaSessionCompat mMediaSession;
     private PlaybackStateCompat.Builder mStateBuilder;
-    private NotificationManager mNotificationManager;
 
 
 
@@ -147,7 +146,7 @@ public class StepDetailFragment extends Fragment
             }
         });
 
-        getLoaderManager().restartLoader(CURSOR_STEP_LOADER,null,this);
+
 
 
         return rootView;
@@ -161,6 +160,7 @@ public class StepDetailFragment extends Fragment
             stepNumberView = rootView.findViewById(R.id.step_detail_step_number_view);
             shortDescriptionView = rootView.findViewById(R.id.step_detail_short_description);
             descriptionView = rootView.findViewById(R.id.step_detail_description);
+
             if(isTablet){
                 nextBtn.setVisibility(View.INVISIBLE);
                 prevBtn.setVisibility(View.INVISIBLE);
@@ -197,9 +197,7 @@ public class StepDetailFragment extends Fragment
             }
         }
         else {
-
-            landscapeConstraintLayout = (ConstraintLayout) rootView.findViewById(R.id.land_error_constraints);
-
+            landscapeConstraintLayout = rootView.findViewById(R.id.land_error_constraints);
         }
     }
 
@@ -239,6 +237,7 @@ public class StepDetailFragment extends Fragment
 
                     Step thisStep = BakeItUtils.getStepFromContentValues(data);
                     String description=null;
+
                     if(thisStep.getId()!=0) {
                         description = thisStep.getDescription().substring(3);
                     }else {
@@ -298,6 +297,8 @@ public class StepDetailFragment extends Fragment
         refreshBtn.setVisibility(View.VISIBLE);
     }
 
+
+
     private void hideErrorMessage(){
         mSimpleExoPlayerView.setVisibility(View.VISIBLE);
         errorTextView.setVisibility(View.INVISIBLE);
@@ -306,6 +307,7 @@ public class StepDetailFragment extends Fragment
             landscapeConstraintLayout.setVisibility(View.INVISIBLE);
         }
     }
+
 
 
     private void setImageResource(String imgUrl){
@@ -333,7 +335,7 @@ public class StepDetailFragment extends Fragment
             mSimpleExoPlayerView.setPlayer(mExoPlayer);
             Log.d(TAG, "isPlay ready is "+isPlayReady);
             mExoPlayer.setPlayWhenReady(isPlayReady);
-            mExoPlayer.seekTo(currentWindow,playbackPosition);
+
             mExoPlayer.addListener(this);
 
         }
@@ -341,6 +343,7 @@ public class StepDetailFragment extends Fragment
         MediaSource mediaSource = new ExtractorMediaSource.Factory(new DefaultHttpDataSourceFactory("Baking Instruction Video"))
                 .createMediaSource(mediaUri);
         mExoPlayer.prepare(mediaSource, true, false);
+        mExoPlayer.seekTo(currentWindow,playbackPosition);
     }
 
 
@@ -540,19 +543,45 @@ public class StepDetailFragment extends Fragment
 
     private void releaseResources(){
         if(mExoPlayer!=null) {
-//            mNotificationManager.cancelAll();
             mExoPlayer.release();
             mExoPlayer = null;
             mMediaSession.setActive(false);
         }
+    }
 
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (Util.SDK_INT > 23) {
+            getLoaderManager().restartLoader(CURSOR_STEP_LOADER,null,this);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (Util.SDK_INT <= 23) {
+           getLoaderManager().restartLoader(CURSOR_STEP_LOADER,null,this);
+        }
     }
 
     @Override
     public void onStop() {
         super.onStop();
         Log.d(TAG,"On stop called");
-        releaseResources();
+        if (Util.SDK_INT > 23) {
+            releaseResources();
+        }
+
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (Util.SDK_INT <= 23) {
+            releaseResources();
+        }
     }
 
     @Override
