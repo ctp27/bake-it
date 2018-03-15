@@ -33,6 +33,9 @@ public class BakeSyncTask {
         catch (IOException e){
 
         }
+        if(response==null){
+            return;
+        }
 
         List<Recipe> recipes = null;
 

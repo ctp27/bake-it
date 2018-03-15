@@ -5,7 +5,7 @@ import android.support.test.espresso.IdlingResource;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-;
+
 
 /**
  * Created by clinton on 3/11/18.

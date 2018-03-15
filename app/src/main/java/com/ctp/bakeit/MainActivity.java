@@ -14,6 +14,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.ctp.bakeit.adapters.RecipeAdapter;
 import com.ctp.bakeit.idlingresource.TestIdlingResource;
@@ -35,6 +38,11 @@ public class MainActivity extends AppCompatActivity
     private RecipeAdapter mRecipeAdapter;
 
     @BindView(R.id.recipes_recycler_view)  RecyclerView recipeRecyclerView;
+    @BindView(R.id.error_text_view)
+    TextView errorTextView;
+
+    @BindView(R.id.refresh_btn)
+    ImageButton refreshBtn;
 
     @Nullable
     private TestIdlingResource mIdlingResource;
@@ -42,6 +50,8 @@ public class MainActivity extends AppCompatActivity
 
 
     @BindBool(R.bool.isTablet) boolean isTablet;
+
+
 
 
     @Override
@@ -61,6 +71,12 @@ public class MainActivity extends AppCompatActivity
         }
 
 
+        refreshBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                BakeItSyncUtils.startImmediateSync(MainActivity.this);
+            }
+        });
 
         BakeItSyncUtils.initialize(this);
     }
@@ -82,8 +98,13 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onLoadFinished(android.support.v4.content.Loader<Cursor> loader, Cursor data) {
 
-        if(data==null)
+        if(data==null || data.getCount()==0){
+            displayConnectivityErrorMessage();
             return;
+        }
+
+        hideConnectivityErrorMessage();
+        
         if(mRecipeAdapter==null) {
             mRecipeAdapter = new RecipeAdapter(data, this);
             recipeRecyclerView.setAdapter(mRecipeAdapter);
@@ -95,6 +116,18 @@ public class MainActivity extends AppCompatActivity
         if(mIdlingResource!=null){
             mIdlingResource.setIdleState(true);
         }
+    }
+
+    private void hideConnectivityErrorMessage() {
+        errorTextView.setVisibility(View.INVISIBLE);
+        refreshBtn.setVisibility(View.INVISIBLE);
+        recipeRecyclerView.setVisibility(View.VISIBLE);
+    }
+
+    private void displayConnectivityErrorMessage() {
+        recipeRecyclerView.setVisibility(View.INVISIBLE);
+        errorTextView.setVisibility(View.VISIBLE);
+        refreshBtn.setVisibility(View.VISIBLE);
     }
 
     @Override

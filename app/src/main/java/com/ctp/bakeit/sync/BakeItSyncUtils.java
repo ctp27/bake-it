@@ -157,7 +157,7 @@ public class BakeItSyncUtils {
     }
 
 
-    private static void startImmediateSync(Context context){
+    public static void startImmediateSync(Context context){
         Intent syncIntent = new Intent(context,BakeItSyncIntentService.class);
         context.startService(syncIntent);
     }

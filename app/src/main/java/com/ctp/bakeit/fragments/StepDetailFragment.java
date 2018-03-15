@@ -146,9 +146,6 @@ public class StepDetailFragment extends Fragment
             }
         });
 
-
-
-
         return rootView;
     }
 
@@ -311,6 +308,7 @@ public class StepDetailFragment extends Fragment
 
 
     private void setImageResource(String imgUrl){
+
         mSimpleExoPlayerView.setVisibility(View.INVISIBLE);
         thumbnailImage.setVisibility(View.VISIBLE);
         if(imgUrl!=null && !imgUrl.trim().isEmpty()) {
@@ -327,7 +325,9 @@ public class StepDetailFragment extends Fragment
 
 
     private void initializeExoPlayer(Uri mediaUri) {
+
         if (mExoPlayer == null) {
+
             TrackSelector trackSelector = new DefaultTrackSelector();
             LoadControl loadControl = new DefaultLoadControl();
             mExoPlayer = ExoPlayerFactory.newSimpleInstance(new DefaultRenderersFactory(getContext()),
@@ -335,7 +335,6 @@ public class StepDetailFragment extends Fragment
             mSimpleExoPlayerView.setPlayer(mExoPlayer);
             Log.d(TAG, "isPlay ready is "+isPlayReady);
             mExoPlayer.setPlayWhenReady(isPlayReady);
-
             mExoPlayer.addListener(this);
 
         }
@@ -465,22 +464,6 @@ public class StepDetailFragment extends Fragment
 
 
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        Log.d(TAG,"Saving instances");
-        if(mExoPlayer!=null) {
-            playbackPosition = mExoPlayer.getCurrentPosition();
-            currentWindow = mExoPlayer.getCurrentWindowIndex();
-        }
-
-        outState.putInt(BUNDLE_STEP_ID_KEY, stepNumber);
-        outState.putString(BUNDLE_STEP_RECIPE_ID,recipeId);
-        outState.putInt(BUNDLE_STEP_COUNT,count);
-        outState.putLong(BUNDLE_PLAYBACK_POSITION_KEY,playbackPosition);
-        outState.putInt(BUNDLE_CURRENT_WINDOW_KEY,currentWindow);
-        outState.putBoolean(BUNDLE_IS_PLAY_READY_KEY,isPlayReady);
-    }
-
     private void restoreVariablesIfSavedBundle(Bundle savedInstanceState){
 
         if(savedInstanceState==null){
@@ -498,6 +481,25 @@ public class StepDetailFragment extends Fragment
         currentWindow = savedInstanceState.getInt(BUNDLE_CURRENT_WINDOW_KEY);
         isPlayReady = savedInstanceState.getBoolean(BUNDLE_IS_PLAY_READY_KEY);
     }
+
+
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        Log.d(TAG,"Saving instances");
+
+
+        outState.putInt(BUNDLE_STEP_ID_KEY, stepNumber);
+        outState.putString(BUNDLE_STEP_RECIPE_ID,recipeId);
+        outState.putInt(BUNDLE_STEP_COUNT,count);
+        outState.putLong(BUNDLE_PLAYBACK_POSITION_KEY,playbackPosition);
+        outState.putInt(BUNDLE_CURRENT_WINDOW_KEY,currentWindow);
+        outState.putBoolean(BUNDLE_IS_PLAY_READY_KEY,isPlayReady);
+    }
+
+
+
+
 
     private void replaceFragment(int newPosition){
 
@@ -579,6 +581,12 @@ public class StepDetailFragment extends Fragment
     @Override
     public void onPause() {
         super.onPause();
+        if(mExoPlayer!=null) {
+            playbackPosition = mExoPlayer.getCurrentPosition();
+            currentWindow = mExoPlayer.getCurrentWindowIndex();
+            isPlayReady = mExoPlayer.getPlayWhenReady();
+        }
+
         if (Util.SDK_INT <= 23) {
             releaseResources();
         }
