@@ -60,6 +60,11 @@ public class RecipeStepsAdapter extends RecyclerView.Adapter<RecipeStepsAdapter.
             }
         }
 
+//        if(position==cursor.getCount()-1){
+//            holder.seperatorView.setVisibility(View.GONE);
+//        }
+
+
         /*  Move cursor to current position */
         cursor.moveToPosition(position);
 
@@ -104,6 +109,9 @@ public class RecipeStepsAdapter extends RecyclerView.Adapter<RecipeStepsAdapter.
 
         @BindView(R.id.recipe_step_description)
         TextView description;
+
+        @BindView(R.id.seperator)
+        View seperatorView;
 
         public RecipeStepsViewHolder(View itemView) {
             super(itemView);

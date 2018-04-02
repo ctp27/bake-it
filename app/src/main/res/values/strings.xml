@@ -21,4 +21,5 @@
     <string name="no_internet_message_text">Media not available when offline</string>
     <string name="refresh_btn_txt">Refresh</string>
     <string name="main_activity_error_msg">Oops! Something went wrong. Please check your internet connection and try again</string>
+    <string name="pin_to_widget_title">Pin to Widget</string>
 </resources>
