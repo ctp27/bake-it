@@ -33,3 +33,9 @@ The application dynamically scales itself to fill tablet devices
 1. Clone the project
 2. Import the project into Android Studio as an existing android application
 
+# Download BakeIt
+
+You can download the application from Google Play here:
+
+https://play.google.com/store/apps/details?id=com.ctp.bakeit
+
