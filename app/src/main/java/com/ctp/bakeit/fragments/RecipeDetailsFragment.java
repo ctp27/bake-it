@@ -158,6 +158,8 @@ public class RecipeDetailsFragment extends Fragment
         recipeStepRecyclerView.setLayoutManager(recipeStepsLayoutManager);
         recipeStepRecyclerView.setHasFixedSize(true);
         recipeStepRecyclerView.setVerticalScrollBarEnabled(false);
+        recipeStepRecyclerView.setNestedScrollingEnabled(false);
+
 
         LinearLayoutManager ingredientLayoutManager =
                 new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false);
@@ -165,6 +167,7 @@ public class RecipeDetailsFragment extends Fragment
         ingredientsRecyclerView.setLayoutManager(ingredientLayoutManager);
         ingredientsRecyclerView.setHasFixedSize(true);
         recipeStepRecyclerView.setVerticalScrollBarEnabled(false);
+        ingredientsRecyclerView.setNestedScrollingEnabled(false);
 
         addToWidgetTextView.setOnClickListener(new View.OnClickListener() {
             @Override
